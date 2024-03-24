@@ -1,6 +1,18 @@
 #pragma once
 
 #include "byte_stream.hh"
+#include <queue>
+#include <vector>
+#include <map>
+#include <set>
+
+typedef std::map<uint64_t, std::string> mm;
+
+struct Compare {
+  bool operator() (const mm& a, const mm& b) const {
+    return a.begin()->first < b.begin()->first;
+  }
+};
 
 class Reassembler
 {
@@ -42,4 +54,33 @@ public:
 
 private:
   ByteStream output_; // the Reassembler writes to this ByteStream
+  uint64_t pendcnt_ {}; // the bytes are stored in the Reassembler
+  bool is_reasm_close_ {};
+  uint64_t min_idx {};
+  
+protected:
+  std::priority_queue<mm, std::vector<mm>, Compare> buffer {};
+
+public:
+  void incre_pendcnt(uint64_t n) {
+    pendcnt_ += n;
+  }
+  void decre_pendcnt(uint64_t n) {
+    pendcnt_ -= n;
+  }
+  uint64_t get_pendcnt() const {
+    return pendcnt_;
+  }
+  void turnoff_stream() {
+    is_reasm_close_ = true;
+  }
+  bool get_stream() {
+    return is_reasm_close_;
+  }
+  uint64_t get_min_idx() {
+    return min_idx;
+  }
+  void modify_min_idx_to(uint64_t n) {
+    min_idx = n;
+  }
 };
