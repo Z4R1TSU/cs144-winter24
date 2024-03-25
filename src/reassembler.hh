@@ -59,6 +59,7 @@ private:
   uint64_t min_idx {};
   
 protected:
+  // the reassembler itself
   std::priority_queue<mm, std::vector<mm>, Compare> buffer {};
 
 public:
